@@ -2,37 +2,37 @@
 
 PSQL="psql --username=freecodecamp --dbname=periodic_table -t --no-align -c"
 
-# no argument
+# Argument Null
 if [[ -z $1 ]]
 then
   echo "Please provide an element as an argument."
   exit
 fi
-# if argument is a number
+# Argument Angka
 if [[ $1 =~ ^[0-9]+$ ]]
 then
-  ELEMENT_INFO=$($PSQL "SELECT atomic_number, name, symbol, type, atomic_mass, melting_point_celsius, boiling_point_celsius 
+  element_result=$($PSQL "SELECT atomic_number, name, symbol, type, atomic_mass, melting_point_celsius, boiling_point_celsius 
   FROM elements 
   INNER JOIN properties USING(atomic_number) 
   INNER JOIN types USING(type_id)
   WHERE atomic_number = $1")
 else
-  # if argument is a symbol or name
-  ELEMENT_INFO=$($PSQL "SELECT atomic_number, name, symbol, type, atomic_mass, melting_point_celsius, boiling_point_celsius 
+  # Argumen Nama / Simbol
+  element_result=$($PSQL "SELECT atomic_number, name, symbol, type, atomic_mass, melting_point_celsius, boiling_point_celsius 
   FROM elements 
   INNER JOIN properties USING(atomic_number) 
   INNER JOIN types USING(type_id)
   WHERE symbol = '$1' OR name = '$1'")
 fi
 
-# if no result
-if [[ -z $ELEMENT_INFO ]]
+# Hasil Null
+if [[ -z $element_result ]]
 then
   echo "I could not find that element in the database."
   exit
 fi
 
-# parse result
-IFS="|" read ATOMIC_NUMBER NAME SYMBOL TYPE MASS MELT BOIL <<< "$ELEMENT_INFO"
+# Total Hasil
+IFS="|" read atomic_no element_name element_symbol element_type atomic_weight melt_temp boil_temp <<< "$element_result"
 
-echo "The element with atomic number $ATOMIC_NUMBER is $NAME ($SYMBOL). It's a $TYPE, with a mass of $MASS amu. $NAME has a melting point of $MELT celsius and a boiling point of $BOIL celsius."
+echo "The element with atomic number $atomic_no is $element_name ($element_symbol). It's a $element_type, with a mass of $atomic_weight amu. $element_name has a melting point of $melt_temp celsius and a boiling point of $boil_temp celsius."
